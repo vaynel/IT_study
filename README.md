@@ -1,1 +1,1 @@
-# network_study
+# 나만의 CS 공부 정리 
