@@ -12,7 +12,8 @@ NoSQL은 "Not Only SQL"의 약자로, 관계형 데이터모델의 한계를 극
     * 조회 속도가 매우 빠름 (O(1)).
     * 복잡한 쿼리나 조인(Join) 기능이 없음.
 * **주요 용도:** 캐싱(Caching), 세션 관리, 사용자 설정 저장.
-* **대표 제품:** **Redis**, Memcached, Amazon DynamoDB.
+* **대표 제품**
+>> **Redis**, Memcached, Amazon DynamoDB.
 
 ---
 
@@ -24,7 +25,8 @@ NoSQL은 "Not Only SQL"의 약자로, 관계형 데이터모델의 한계를 극
     * 스키마가 유연하여(Schema-less) 각 문서가 서로 다른 필드를 가질 수 있음.
     * 문서 내부의 필드를 이용한 인덱싱 및 쿼리가 가능함.
 * **주요 용도:** 콘텐츠 관리 시스템(CMS), 이커머스 상품 정보, 모바일 앱 백엔드.
-* **대표 제품:** **MongoDB**, CouchDB, Firebase Realtime DB.
+* **대표 제품:**
+>> **MongoDB**, CouchDB, Firebase Realtime DB.
 
 ---
 
@@ -36,7 +38,8 @@ NoSQL은 "Not Only SQL"의 약자로, 관계형 데이터모델의 한계를 극
     * 수 페타바이트(PB) 급의 대규모 데이터 처리에 매우 강력한 확장성을 가짐.
     * 쓰기(Write) 성능이 매우 뛰어남.
 * **주요 용도:** 빅데이터 분석, 타임스탬프 데이터(로그), IoT 센서 데이터.
-* **대표 제품:** **Apache Cassandra**, HBase, Google Bigtable.
+* **대표 제품:**
+>> **Apache Cassandra**, HBase, Google Bigtable.
 
 ---
 
@@ -47,7 +50,8 @@ NoSQL은 "Not Only SQL"의 약자로, 관계형 데이터모델의 한계를 극
     * 관계형 DB에서 여러 단계의 Join이 필요한 복잡한 관계를 빠르게 조회 가능.
     * 데이터 간의 연결 고리를 시각화하고 분석하는 데 최적.
 * **주요 용도:** 소셜 네트워크 서비스(SNS) 친구 추천, 사기 탐지(Fraud Detection), 지식 그래프.
-* **대표 제품:** **Neo4j**, JanusGraph, Amazon Neptune.
+* **대표 제품:**
+>> **Neo4j**, JanusGraph, Amazon Neptune.
 
 ---
 
