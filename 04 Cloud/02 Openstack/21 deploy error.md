@@ -1,6 +1,6 @@
 # Deploy 실행시 발생한 에러 
 ## openvswitch : Ensuring OVS ports are properly setup error
-**원인** : br-ex가 브릿인데, br-ex라는 포트도 있어서 꼬인 상황
+**원인** : br-ex가 브릿인데, br-ex라는 포트도 있어서 꼬인 상황  
 **에러로그**
 ```bash
 TASK [openvswitch : Ensuring OVS ports are properly setup] **************************************************************************************************************************************************************************
