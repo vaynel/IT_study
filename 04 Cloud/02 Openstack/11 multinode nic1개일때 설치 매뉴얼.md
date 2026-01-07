@@ -85,6 +85,15 @@ ip link set br-ex up
 
 
 ### 두번째 deploy 실행
+global.yaml
 ```bash
+neutron_bridge_name: br-ex
+tunnel_interface: br-ex
 neutron-external-network = br-ex
+```
+
+multinode
+```bash
+controller network_interface=물리NIC 
+compute network_interface=br-ex neutron_external_interface=물리NIC
 ```
