@@ -63,7 +63,7 @@ NIC가 1개인 환경에서는 다음 요구사항이 동시에 존재한다.
 ## 상세 방법
 ### 첫번째 deploy 실행
 ```bash
-neutron-external-network = 물리 NIC
+neutron_external_interface = 물리 NIC
 ```
 
 ### Open vSwitch 구성
