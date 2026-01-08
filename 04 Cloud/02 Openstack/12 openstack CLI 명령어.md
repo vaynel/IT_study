@@ -24,6 +24,21 @@ export OS_IDENTITY_API_VERSION=3
 
 ---
 
+
+```bash
+# 프로젝트 목록 확인
+openstack project list
+
+# 이미지 목록 확인
+openstack image list
+
+# 인스턴스 목록 확인
+openstack server list
+```
+
+**참고**: `source` 명령어는 현재 셸 세션에서만 환경 변수를 설정합니다. 새로운 터미널 세션에서는 다시 `source openstack_rc.sh`를 실행해야 합니다.
+
+
 ## 2. 이미지 생성
 Openstack에서 이미지를 생성하려면 다음 명령어를 사용합니다:
 
@@ -79,20 +94,91 @@ openstack flavor create --id auto --ram 8192 --disk 40 --vcpus 2 m5.large
 ## 4. 네트워크 생성
 Openstack에서 네트워크를 생성하려면 다음 명령어를 사용합니다:
 
+### 기본 네트워크 생성
 ```bash
 openstack network create <network_name>
 ```
 
 - `<network_name>`: 생성할 네트워크의 이름
 
-서브넷을 추가하려면 다음 명령어를 사용합니다:
+### 외부 네트워크 생성 (Provider Network)
+외부 네트워크는 물리 네트워크와 연결되어 외부 인터넷에 접근할 수 있는 네트워크입니다:
 
 ```bash
-openstack subnet create --network <network_name> --subnet-range <subnet_cidr> <subnet_name>
+openstack network create \
+  --external \
+  --provider-physical-network <physical_network_name> \
+  --provider-network-type <network_type> \
+  <network_name>
 ```
 
-- `<subnet_cidr>`: 서브넷 CIDR (예: 192.168.1.0/24)
-- `<subnet_name>`: 생성할 서브넷의 이름
+**옵션 설명:**
+- `--external`: 외부 네트워크로 설정
+- `--provider-physical-network`: 물리 네트워크 이름 (예: `physnet1`, `datacentre`)
+- `--provider-network-type`: 네트워크 타입
+  - `flat`: 단일 물리 네트워크 사용
+  - `vlan`: VLAN 태깅 사용
+  - `vxlan`: VXLAN 오버레이 네트워크
+  - `gre`: GRE 터널 사용
+
+**예제:**
+```bash
+# Flat 타입 외부 네트워크 생성
+openstack network create \
+  --external \
+  --provider-physical-network physnet1 \
+  --provider-network-type flat \
+  external-network
+
+# VLAN 타입 외부 네트워크 생성
+openstack network create \
+  --external \
+  --provider-physical-network physnet1 \
+  --provider-network-type vlan \
+  --provider-segment 100 \
+  external-vlan-network
+```
+
+### 서브넷 생성
+서브넷을 추가하려면 다음 명령어를 사용합니다:
+
+**기본 서브넷:**
+```bash
+openstack subnet create \
+  --network <network_name> \
+  --subnet-range <subnet_cidr> \
+  <subnet_name>
+```
+
+**외부 네트워크 서브넷 (게이트웨이 포함):**
+```bash
+openstack subnet create \
+  --network <network_name> \
+  --subnet-range <subnet_cidr> \
+  --gateway <gateway_ip> \
+  --allocation-pool start=<start_ip>,end=<end_ip> \
+  --dns-nameserver <dns_server> \
+  <subnet_name>
+```
+
+**옵션 설명:**
+- `--subnet-range`: 서브넷 CIDR (예: `192.168.1.0/24`)
+- `--gateway`: 게이트웨이 IP 주소 (예: `192.168.1.1`)
+- `--allocation-pool`: IP 할당 풀 범위 (예: `start=192.168.1.10,end=192.168.1.200`)
+- `--dns-nameserver`: DNS 서버 주소 (예: `8.8.8.8`)
+- `--subnet-name`: 생성할 서브넷의 이름
+
+**예제:**
+```bash
+# 외부 네트워크 서브넷 생성
+openstack subnet create \
+  --network external-network \
+  --subnet-range 192.168.35.0/24 \
+  --gateway 192.168.35.1 \
+  --allocation-pool start=192.168.35.10,end=192.168.35.199 \
+  --dns-nameserver 8.8.8.8 \
+  external-subnet
+```
 
 ---
 
