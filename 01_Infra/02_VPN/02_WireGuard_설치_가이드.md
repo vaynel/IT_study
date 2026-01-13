@@ -553,3 +553,4 @@ sudo systemctl restart wg-quick@wg0
 - [ ] 서버에 클라이언트 등록 완료
 - [ ] 연결 테스트 성공
 
+
