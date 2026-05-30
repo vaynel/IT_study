@@ -27,16 +27,44 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "30바이브코딩/01바이브코딩 가이드.md",
+                "file": "20_디자인/WCAG2.1.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "01바이브코딩 가이드"
+              "title": "WCAG2.1"
+            }
+          },
+          {
+            "id": "d450402829cbd7cb",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "60_Project/01_Traiding/01_요구사항정의서.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "01_요구사항정의서"
+            }
+          },
+          {
+            "id": "a6c924d8c4e76ed6",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "90_StudyList/가상화 공부 플랜.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "가상화 공부 플랜"
             }
           }
         ],
-        "currentTab": 1
+        "currentTab": 3
       }
     ],
     "direction": "vertical"
@@ -93,7 +121,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 249.5
   },
   "right": {
     "id": "44cf139139f441e6",
@@ -195,16 +223,37 @@
       "bases:새 베이스 생성하기": false
     }
   },
-  "active": "c72da031c62f8478",
+  "active": "a6c924d8c4e76ed6",
   "lastOpenFiles": [
-    "00_다이어그램/01_UML_다이어그램_상세.md",
-    "30바이브코딩/01바이브코딩 가이드.md",
-    "30바이브코딩",
     "무제.base",
+    "90_StudyList/클라우드 공부 리스트.md",
+    "2026-05-30.md",
+    "무제.canvas",
+    "90_StudyList/끄적이는 공부리스트.md",
+    "90_StudyList/네트워크 공부리스트.md",
+    "90_StudyList/데이터 엔지니어링.md",
+    "90_StudyList/데이터 베이스 공부 리스트.md",
+    "90_StudyList/가상화 공부 플랜.md",
+    "91 lecture/01 코딩하는 기술사/대규모 트래픽 처리 경험.md",
+    "91 lecture/01 코딩하는 기술사/코드 리뷰에서 O(N²)이에요, 들어본 적 있나요.md",
+    "91 lecture/99 Image/Pasted image 20260530155225.png",
+    "91 lecture/99 Image/Pasted image 20260530155111.png",
+    "91 lecture/99 Image",
+    "60_Project/01_Traiding/01_요구사항정의서.md",
+    "20_디자인/WCAG2.1.md",
+    "91 lecture/01 코딩하는 기술사",
+    "무제",
+    "91 lecture",
+    "60_Project/01_Traiding/00_프로젝트기획서.md",
+    "70 Diary/26.05.20.md",
+    "AI 개발자동화.md",
+    "22 보안/OWASP ASVS vs NIST SP 800-63 차이점.md",
+    "22 보안",
+    "30바이브코딩/01바이브코딩 가이드.md",
+    "00_다이어그램/01_UML_다이어그램_상세.md",
+    "30바이브코딩",
     "무제 1.base",
     "폴더구조_검점_및_제안.md",
-    "90_StudyList/클라우드 공부 리스트.md",
-    "60_Project/01_Traiding/00_프로젝트기획서.md",
     "2026-05-09.md",
     "무제 2.canvas",
     "80_blog/00 개요.md",
@@ -213,11 +262,6 @@
     "70 Diary/26.03.11.md",
     "70 Diary/26.02.03.md",
     "07_FrontFramework/01_Angular/00_Angular_개요.md",
-    "06_디자인패턴/01_MVC패턴.md",
-    "06_디자인패턴/00_디자인패턴_리스트.md",
-    "05_DevOps/01_CI_CD/01_GitHub_Actions.md",
-    "무제 1.canvas",
-    "무제.canvas",
-    "05_DevOps/01_CI_CD/02_Jenkins.md"
+    "무제 1.canvas"
   ]
 }
