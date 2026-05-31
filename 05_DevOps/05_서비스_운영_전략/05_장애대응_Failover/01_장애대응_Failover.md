@@ -1,6 +1,17 @@
-# 장애대응 / Failover
+---
+tags:
+  - devops
+  - failover
+  - 장애대응
+  - 운영전략
+---
 
-## 핵심 지표
+# 장애대응 및 Failover
+
+> [!abstract] 개요
+> 장애 발생 시 자동으로 정상 노드로 트래픽을 전환(Failover)하여 서비스 중단 시간을 최소화하고, 신속하게 시스템을 복구하는 핵심 운영 전략입니다.
+
+## 1. 핵심 지표
 
 | 지표 | 의미 | 목표 |
 |------|------|------|
@@ -9,7 +20,7 @@
 | **MTTR** (Mean Time To Repair) | 평균 복구 시간 | 줄이는 것이 목표 |
 | **MTBF** (Mean Time Between Failures) | 평균 장애 간격 | 늘리는 것이 목표 |
 
-```
+```text
 장애 발생        복구 완료
    │                │
    ├── RTO ─────────┤  (이 시간 안에 복구해야 함)
@@ -18,100 +29,45 @@
           최근 백업
 ```
 
----
+## 2. 네트워크 계층 관점 (OSI 7 Layer)
 
-## Failover (자동 전환)
+- **L3 (네트워크 계층):** BGP 기반의 라우팅이나 글로벌 DNS 설정을 조작하여, 리전(Region) 또는 데이터센터 단위 장애 시 다른 지역으로 트래픽 전체를 전환합니다.
+- **L4 (전송 계층):** 로드밸런서가 백엔드 서버의 TCP/UDP 포트 연결 상태를 지속적으로 확인(Health Check)하고, 연결 실패 시 해당 노드를 라우팅 대상에서 제외합니다.
+- **L7 (응용 계층):** HTTP 응답 코드(예: 500 에러)나 애플리케이션 지연 시간 등을 감지하여, [[01_로드밸런싱]] 규칙에 따라 정상 서비스나 대기 페이지로 트래픽을 우회합니다.
 
-장애 감지 시 **자동으로 트래픽을 정상 노드로 전환**하는 메커니즘.
+## 3. 구현 도구 및 서비스
 
-### 헬스체크 기반 Failover
+| 구분 | 오픈소스 (직접 구축) | 상용 / 클라우드 서비스 |
+| :--- | :--- | :--- |
+| **클러스터 관리 / HA** | Keepalived, Pacemaker, Corosync | AWS Auto Scaling, Azure VM Scale Sets |
+| **DNS 레벨 Failover** | CoreDNS, BIND | AWS Route 53, Cloudflare DNS |
+| **서비스 메시 (차단)** | Envoy, Istio (Circuit Breaker 내장) | AWS App Mesh |
 
-```
-[LB] ──── Health Check ────→ [Server A]  ← 응답 없음
-                              [Server B]  ← 정상
+## 4. 핵심 장애 대응 패턴
 
-→ LB가 Server A를 풀에서 제거, Server B로만 라우팅
-```
+### 4.1. 헬스체크 및 트래픽 격리 (Isolation)
 
-### DB Failover (Primary-Replica)
+> [!warning] 얕은 헬스체크 vs 깊은 헬스체크
+> - **Shallow Check:** 단순 `/health` 엔드포인트의 200 응답만 확인. 속도는 빠르나 DB 연동 오류 등은 감지 불가.
+> - **Deep Check:** DB, 캐시, 외부 API 등 의존성 연결까지 모두 확인. 서비스의 실제 가용성을 판단하지만 오버헤드가 발생할 수 있음.
 
-```
-평상시:  Client → Primary (쓰기/읽기)
-                     │ Replication
-                  Replica (읽기 전용)
+### 4.2. DB Failover (Primary-Replica)
 
-장애 시: Primary 다운 감지
-         Replica → Primary로 승격 (자동 or 수동)
-         Client → 새 Primary로 연결
-```
+평상시에는 쓰기 트래픽을 Primary로, 읽기 트래픽을 Replica로 분산합니다.
+Primary 노드에 장애가 감지되면, 복제본(Replica) 중 하나를 새로운 Primary로 자동 승격(Promotion)시키고 애플리케이션의 연결 설정을 동적으로 변경합니다.
 
----
+### 4.3. Circuit Breaker (서킷 브레이커) 패턴
 
-## 헬스체크 설계
+외부 시스템 장애가 내부 전체로 전파되는 것을 막는 패턴입니다.
 
-### 얕은 헬스체크 (Shallow)
-- `/health` 엔드포인트가 200 응답만 확인
-- 빠르지만 DB 연결 등 내부 문제는 감지 못 함
+- **CLOSED:** 정상 상태 (트래픽 통과)
+- **OPEN:** 장애 감지 (즉시 에러 반환, 타임아웃 방지)
+- **HALF-OPEN:** 일정 시간 후 일부 트래픽만 시도하여 복구 여부 확인
 
-### 깊은 헬스체크 (Deep)
-- DB 연결, 캐시 연결, 외부 API 등 **의존성까지 확인**
-- 실제 서비스 가능 여부를 정확히 판단
+## 5. 실제 적용 예시
 
-```python
-@app.get("/health")
-def health():
-    checks = {
-        "db": check_db_connection(),
-        "redis": check_redis_connection(),
-    }
-    status = "ok" if all(checks.values()) else "degraded"
-    return {"status": status, "checks": checks}
-```
-
----
-
-## 장애 대응 프로세스
-
-```
-1. 감지 (Detection)
-   └─ 모니터링 알림, 헬스체크 실패
-
-2. 격리 (Isolation)
-   └─ 장애 노드 트래픽 제거, 영향 범위 파악
-
-3. 복구 (Recovery)
-   └─ Failover 전환 or 재시작 or 롤백
-
-4. 원인 분석 (Post-mortem)
-   └─ 로그 분석, 재발 방지 대책 수립
-```
-
----
-
-## Circuit Breaker 패턴
-
-외부 서비스 장애가 **전체 시스템으로 전파되는 것을 차단**하는 패턴.
-
-```
-상태:
-CLOSED  → 정상 통신
-OPEN    → 장애 감지, 요청 즉시 차단 (빠른 실패)
-HALF-OPEN → 일정 시간 후 재시도, 성공하면 CLOSED로 복귀
-
-예시:
-결제 API가 5초 이상 응답 없음
-→ Circuit OPEN
-→ 이후 요청은 즉시 "결제 일시 중단" 반환 (타임아웃 대기 없음)
-→ 30초 후 재시도 (HALF-OPEN)
-```
-
----
-
-## 장애 시나리오 대비 (Runbook)
-
-| 장애 유형 | 감지 방법 | 대응 절차 |
-|----------|----------|----------|
-| 서버 다운 | 헬스체크 실패 | LB에서 제거 → 자동 재시작 |
-| DB Primary 다운 | Replication 끊김 | Replica 승격 → 연결 문자열 변경 |
-| 메모리 부족 | OOM 알림 | 프로세스 재시작 → 스케일 아웃 검토 |
-| 디스크 풀 | 디스크 사용량 알림 | 로그 정리 → 볼륨 확장 |
+> [!example] 글로벌 스트리밍 서비스의 리전 단위 장애 대응
+> 1. 서울 리전(Active)에 메인 서버, 도쿄 리전(Passive)에 백업 서버를 [[01_이중화]] 구성합니다.
+> 2. AWS Route 53(DNS)이 1분마다 서울 리전의 상태를 체크합니다.
+> 3. 데이터센터 전원 차단으로 서울 리전 응답이 없으면, DNS가 즉시 도메인의 IP를 도쿄 리전으로 변경(Failover)합니다.
+> 4. 사용자는 일시적인 끊김 후, 자동으로 복구된 백업 서버를 통해 서비스를 계속 이용할 수 있습니다.
